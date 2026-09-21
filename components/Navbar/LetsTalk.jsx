@@ -3,7 +3,7 @@ import { useSpring, animated } from "@react-spring/web";
 
 // Same address used in `Contact` and `SiteFooter`. If any of these change,
 // keep all three places in sync.
-const EMAIL = "abdelruhamanelfekky@gmail.com";
+const EMAIL = "vaishusharma44444@gmail.com";
 
 // "LET'S TALK" was previously a non-interactive div. It now opens the user's
 // mail client straight to the real contact email — which is also wired up
@@ -41,7 +41,7 @@ const LetsTalk = () => {
       }}
     >
       <animated.span style={opacitySpringsReverse} className="opacity-0">➔</animated.span>
-      <animated.span style={springs}>LET'S TALK &nbsp;</animated.span>
+      <animated.span style={springs}>LET&apos;S TALK &nbsp;</animated.span>
       <animated.span style={opacitySprings}>&nbsp;•&nbsp;</animated.span>
     </a>
   );

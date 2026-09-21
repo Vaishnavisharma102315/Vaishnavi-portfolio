@@ -15,7 +15,7 @@ const Description = () => {
           <Trail open={open}>
             <span>We build epic realtime</span>
             <span>interactive experience to</span>
-            <span>blow people's minds</span>
+            <span>blow people&apos;s minds</span>
           </Trail>
         </div>
       </div>
@@ -26,7 +26,7 @@ const Description = () => {
           <Trail open={open}>
             <span>I build epic realtime</span>
             <span>interactive experience to</span>
-            <span>blow people's minds</span>
+            <span>blow people&apos;s minds</span>
           </Trail>
         </div>
       </div>

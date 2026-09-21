@@ -14,7 +14,6 @@ const SunIcon = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    style={{ marginRight: '0.4rem' }}
     aria-hidden="true"
   >
     <circle cx="12" cy="12" r="4" />
@@ -40,24 +39,21 @@ const MoonIcon = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    style={{ marginRight: '0.4rem' }}
     aria-hidden="true"
   >
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
   </svg>
 );
 
-// This used to be the EN/AR language toggle. It's now repurposed as the
-// site-wide theme switcher: the button reads/writes the active theme on
-// `document.documentElement` (the same attribute the no-flash bootstrap
-// script in `app/layout.js` sets on first paint), and persists the user's
-// choice to localStorage so it survives reloads.
-const ThemeButton = () => {
-  const [theme, setTheme] = useState('light');
+// Site-wide theme switcher: reads/writes the active theme on
+// `document.documentElement` (matching the layout script), persists to
+// localStorage, and supports compact mode for mobile navbar/drawers.
+const ThemeButton = ({ compact = false, className = "" }) => {
+  const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const current = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+    const current = document.documentElement.dataset.theme || 'dark';
     setTheme(current);
   }, []);
 
@@ -70,26 +66,39 @@ const ThemeButton = () => {
     try {
       localStorage.setItem('theme', next);
     } catch (e) {
-      // localStorage may be unavailable (private mode, etc.) — the toggle
-      // still works for the current session, just doesn't persist.
+      // localStorage may be unavailable (private mode, etc.)
     }
   };
 
   const isDark = theme === 'dark';
   const label = isDark ? 'LIGHT' : 'DARK';
 
+  if (compact) {
+    return (
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+        aria-pressed={isDark}
+        className={className || "nav_btn_sm flex items-center justify-center cursor-pointer transition-transform hover:scale-105"}
+      >
+        {isDark ? <SunIcon /> : <MoonIcon />}
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"
       onClick={toggle}
-      aria-label="Toggle theme"
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       aria-pressed={isDark}
-      className='nav_btn_lg nav_btn_light flex items-center justify-center hover:bg-brblue py-6 cursor-pointer'
+      className={className || 'nav_btn_lg nav_btn_light flex items-center justify-center hover:bg-brblue py-6 cursor-pointer'}
     >
-      {isDark ? <SunIcon /> : <MoonIcon />}
+      <span className="mr-1.5">{isDark ? <SunIcon /> : <MoonIcon />}</span>
       {label}
     </button>
-  )
-}
+  );
+};
 
-export default ThemeButton
+export default ThemeButton;

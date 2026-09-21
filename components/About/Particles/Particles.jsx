@@ -1,6 +1,6 @@
 'use client'
 import { Canvas, useFrame } from "@react-three/fiber";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { fetchData } from "@/components/Loaders/loader";
 import * as THREE from "three";
 import { OrbitControls,  ScrollControls, useScroll } from "@react-three/drei";
@@ -24,11 +24,12 @@ const Particles = () => {
   // useEffect(() => {
   //   fetchData("/assets/cross.buf").then((mesh) => (ref.current.geometry = mesh.geometry));
   // }, []);
-  const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+  const sphereGeometry = useMemo(() => new THREE.SphereGeometry(1, 32, 32), []);
   useEffect(() => {
-    console.log(sphereGeometry)
-    ref.current.geometry = sphereGeometry
-  }, [])
+    if (ref.current) {
+      ref.current.geometry = sphereGeometry;
+    }
+  }, [sphereGeometry]);
 
   // useFrame(() => {
   //   if (ref.current) ref.current.rotation.x = ref.current.rotation.y = ref.current.rotation.z += 0.01;
@@ -42,15 +43,24 @@ const Particles = () => {
 };
 const Stars = () => {
   const ref = useRef();
-  const starsGeometry = new THREE.BufferGeometry();
-  const initialGeometry = new THREE.SphereGeometry(2, 64, 64);
+  const initialGeometry = useMemo(() => new THREE.SphereGeometry(2, 64, 64), []);
+  const starsGeometry = useMemo(() => {
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute("position", new THREE.Float32BufferAttribute(initialGeometry.attributes.position.array, 3));
+    return geom;
+  }, [initialGeometry]);
   const scrollObject = useScroll();
-  let  finalGeometry = undefined;
-  fetchData('/assets/cross.buf').then(mesh => {
-    finalGeometry = mesh.geometry;
-  })
+  const [finalGeometry, setFinalGeometry] = useState(null);
 
-  starsGeometry.setAttribute("position", new THREE.Float32BufferAttribute(initialGeometry.attributes.position.array, 3));
+  useEffect(() => {
+    fetchData('/assets/cross.buf')
+      .then(mesh => {
+        if (mesh && mesh.geometry) {
+          setFinalGeometry(mesh.geometry);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const mousePos = useRef({ x: 0, y: 0 });
   useEffect(() => {
@@ -62,8 +72,7 @@ const Stars = () => {
     
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-
-  }, [ref.current]);
+  }, [starsGeometry]);
 
   let dt = scrollObject.scroll.current 
   const initArray = initialGeometry.attributes.position.array

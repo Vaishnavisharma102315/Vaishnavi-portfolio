@@ -16,32 +16,28 @@ const SmoothScroll = ({ children }) => {
         window.innerWidth < 1024);
 
     const lenis = new Lenis({
-      duration: isTouch ? 1.0 : 1.5,
+      duration: isTouch ? 0.8 : 1.1,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smooth: true,
-      // On touch devices, native scrolling feels best — disable Lenis touch
-      // smoothing and let the browser handle inertial scrolling natively.
       smoothTouch: false,
-      touchMultiplier: isTouch ? 1.5 : 0.25,
+      touchMultiplier: 1.0,
+      wheelMultiplier: 0.9,
     });
 
-    // Expose the active Lenis instance globally so other components (e.g. the
-    // navbar menu) can request smooth scroll-to-section animations through
-    // the same engine that's already running. Falling back to native
-    // window.scrollTo would fight Lenis and feel jumpy.
     if (typeof window !== "undefined") {
       window.__lenis = lenis;
     }
 
     lenis.on("scroll", ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
+    const rafHandler = (time) => {
       lenis.raf(time * 1000);
-    });
-
-    gsap.ticker.lagSmoothing(0);
+    };
+    gsap.ticker.add(rafHandler);
+    gsap.ticker.lagSmoothing(500, 33);
 
     return () => {
+      gsap.ticker.remove(rafHandler);
       lenis.destroy();
       if (typeof window !== "undefined" && window.__lenis === lenis) {
         delete window.__lenis;

@@ -6,6 +6,32 @@ import * as THREE from "three";
 import { loadAnimationBuffer } from "../Loaders/animationLoader";
 import { useFrame } from "@react-three/fiber";
 
+const BUFFER_PATHS = [
+  "/assets/astronaut_wearpack/astronaut_wearpack.buf",
+  "/assets/astronaut.buf",
+  "/assets/astronaut_glove_shoes/astronaut_glove_shoes.buf",
+  "/assets/astronaut_helmet/astronaut_helmet.buf",
+  "/assets/astronaut_helmet_glass.buf",
+];
+
+const TEXTURE_PATHS = [
+  {
+    base: "/assets/astronaut_glove_shoes/astronaut_glove_shoes_base.webp",
+    arm: "/assets/astronaut_glove_shoes/astronaut_glove_shoes_arm.webp",
+    nor: "/assets/astronaut_glove_shoes/astronaut_glove_shoes_nor.webp",
+  },
+  {
+    base: "/assets/astronaut_helmet/astronaut_helmet_base.webp",
+    arm: "/assets/astronaut_helmet/astronaut_helmet_arm.webp",
+    nor: "/assets/astronaut_helmet/astronaut_helmet_nor.webp",
+  },
+  {
+    base: "/assets/astronaut_wearpack/astronaut_wearpack_base.webp",
+    arm: "/assets/astronaut_wearpack/astronaut_wearpack_arm.webp",
+    nor: "/assets/astronaut_wearpack/astronaut_wearpack_nor.webp",
+  },
+];
+
 const Astronaut = ({ scale = 1, position = [0, 0, 0] }) => {
   const astronaut = useRef();
   const astronaut_wearpack = useRef();
@@ -17,32 +43,6 @@ const Astronaut = ({ scale = 1, position = [0, 0, 0] }) => {
   const [percentageLoaded, setPercentage] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
-
-  const bufferPaths = [
-    "/assets/astronaut_wearpack/astronaut_wearpack.buf",
-    "/assets/astronaut.buf",
-    "/assets/astronaut_glove_shoes/astronaut_glove_shoes.buf",
-    "/assets/astronaut_helmet/astronaut_helmet.buf",
-    "/assets/astronaut_helmet_glass.buf",
-  ];
-
-  const texturePaths = [
-    {
-      base: "/assets/astronaut_glove_shoes/astronaut_glove_shoes_base.webp",
-      arm: "/assets/astronaut_glove_shoes/astronaut_glove_shoes_arm.webp",
-      nor: "/assets/astronaut_glove_shoes/astronaut_glove_shoes_nor.webp",
-    },
-    {
-      base: "/assets/astronaut_helmet/astronaut_helmet_base.webp",
-      arm: "/assets/astronaut_helmet/astronaut_helmet_arm.webp",
-      nor: "/assets/astronaut_helmet/astronaut_helmet_nor.webp",
-    },
-    {
-      base: "/assets/astronaut_wearpack/astronaut_wearpack_base.webp",
-      arm: "/assets/astronaut_wearpack/astronaut_wearpack_arm.webp",
-      nor: "/assets/astronaut_wearpack/astronaut_wearpack_nor.webp",
-    },
-  ];
 
   useEffect(() => {
     let mounted = true;
@@ -62,11 +62,11 @@ const Astronaut = ({ scale = 1, position = [0, 0, 0] }) => {
     const fetchBuffers = async () => {
       try {
         const meshArray = await Promise.all(
-          bufferPaths.map((path) => fetchData(path, setPercentage))
+          BUFFER_PATHS.map((path) => fetchData(path, setPercentage))
         );
 
         const textures = await Promise.all(
-          texturePaths.map((textures) =>
+          TEXTURE_PATHS.map((textures) =>
             Promise.all(
               Object.values(textures).map((texturePath) =>
                 loadTexture(texturePath)

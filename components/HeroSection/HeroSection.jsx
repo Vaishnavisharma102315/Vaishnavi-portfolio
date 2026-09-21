@@ -5,9 +5,14 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import LiquidEther from "../LiquidEther/LiquidEther";
 
-// Module-level constant so the array reference stays stable across renders
-// (otherwise LiquidEther's useEffect would tear down/rebuild WebGL each render).
-const HERO_LIQUID_COLORS = ["#D9E6FF"];
+const HERO_LIQUID_COLORS = [
+  "#38bdf8",
+  "#818cf8",
+  "#c084fc",
+  "#f472b6",
+  "#3b82f6",
+  "#2dd4bf",
+];
 
 const SplitChars = ({ text, className, id }) => {
   return (
@@ -27,13 +32,10 @@ const SplitChars = ({ text, className, id }) => {
 
 const HeroSection = () => {
   const sectionRef = useRef(null);
-  const imgRef = useRef(null);
   const headingRef = useRef(null);
   const loaderRef = useRef(null);
   const loaderCounterRef = useRef(null);
-  const stroke1Ref = useRef(null);
-  const stroke2Ref = useRef(null);
-  const endLineRef = useRef(null);
+  const footerUiRef = useRef(null);
   const parallaxInstanceRef = useRef(null);
   const [loaderDone, setLoaderDone] = useState(false);
 
@@ -41,28 +43,15 @@ const HeroSection = () => {
     gsap.registerPlugin(ScrollTrigger);
     document.body.style.overflow = "hidden";
 
-    const headingChars = headingRef.current.querySelectorAll(".hero-char");
+    const headingChars = headingRef.current?.querySelectorAll(".hero-char") ?? [];
 
     // Hide hero elements initially
     gsap.set(headingChars, { autoAlpha: 0, y: 100 });
-    gsap.set(imgRef.current, { autoAlpha: 0, y: "50%", scale: 0.8 });
-    gsap.set([stroke1Ref.current, stroke2Ref.current], { autoAlpha: 0, width: "0%" });
-    gsap.set(endLineRef.current, { autoAlpha: 0 });
+    if (footerUiRef.current) {
+      gsap.set(footerUiRef.current, { autoAlpha: 0, y: 30 });
+    }
 
-    // Breaker line: invisible at the top of the page, fades in as the user
-    // scrolls down. Tied to scroll position via scrub so it tracks Lenis
-    // smooth-scroll precisely.
-    const endLineTrigger = ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: "top top",
-      end: "+=300",
-      scrub: true,
-      animation: gsap.to(endLineRef.current, { autoAlpha: 1, ease: "none" }),
-    });
-
-    // iOS 13+ requires explicit permission to receive deviceorientation events.
-    // parallax-js uses those events automatically on mobile (gyroscope mode),
-    // so we ask for permission on the first user gesture.
+    // iOS 13+ gyro permission
     const requestGyroPermission = () => {
       if (
         typeof DeviceOrientationEvent !== "undefined" &&
@@ -79,9 +68,7 @@ const HeroSection = () => {
     window.addEventListener("touchstart", handleFirstGesture, { once: true, passive: true });
     window.addEventListener("click", handleFirstGesture, { once: true });
 
-    // Initialize wagerfield/parallax (parallax-js) after GSAP reveal finishes.
-    // On touch devices we keep the gyroscope-driven motion, but soften the
-    // movement so the hero still feels stable on phones.
+    // Initialize parallax-js after GSAP reveal
     const initParallax = async () => {
       if (typeof window === "undefined" || !sectionRef.current) return;
       const isTouch =
@@ -95,21 +82,15 @@ const HeroSection = () => {
           relativeInput: true,
           hoverOnly: !isTouch,
           selector: ".hero-layer",
-          scalarX: isTouch ? 4 : 2,
-          scalarY: isTouch ? 4 : 2,
-          frictionX: isTouch ? 0.18 : 0.1,
-          frictionY: isTouch ? 0.18 : 0.1,
+          scalarX: isTouch ? 3 : 1.5,
+          scalarY: isTouch ? 3 : 1.5,
+          frictionX: 0.15,
+          frictionY: 0.15,
         });
       } catch (err) {
         console.error("Failed to init parallax-js:", err);
       }
     };
-
-    // Pick stroke widths based on viewport so the strokes don't dwarf the hero
-    // on phones.
-    const isMobile = window.matchMedia("(max-width: 768px)").matches;
-    const stroke1Width = isMobile ? "40vw" : "22vw";
-    const stroke2Width = isMobile ? "30vw" : "16vw";
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -121,11 +102,11 @@ const HeroSection = () => {
 
     const counter = { value: 0 };
 
-    // Loader counter: 0 → 100
+    // Loader counter animation
     tl.to(counter, {
       value: 100,
-      duration: 2,
-      ease: "power2.inOut",
+      duration: 0.7,
+      ease: "power2.out",
       onUpdate: () => {
         if (loaderCounterRef.current) {
           loaderCounterRef.current.innerText = `${Math.floor(counter.value)}`;
@@ -133,66 +114,106 @@ const HeroSection = () => {
       },
     }, "anim");
 
-    // Loader slide up
-    tl.to(loaderRef.current, {
-      y: "-100%",
-      duration: 1.8,
-      ease: "power3.out",
-    }, "anim+=2.2");
-
     // Counter fade out
     tl.to(loaderCounterRef.current, {
       autoAlpha: 0,
-      duration: 1,
+      duration: 0.35,
       ease: "power2.out",
-    }, "anim+=2");
+    }, "anim+=0.6");
+
+    // Loader curtain slide up & hide
+    tl.to(loaderRef.current, {
+      y: "-100%",
+      autoAlpha: 0,
+      duration: 0.85,
+      ease: "power3.inOut",
+    }, "anim+=0.75");
 
     // Heading chars animation
     tl.to(headingChars, {
       autoAlpha: 1,
       y: 0,
       stagger: {
-        amount: 0.5,
+        amount: 0.3,
         from: "start",
       },
-      duration: 1,
+      duration: 0.85,
       ease: "power3.out",
-    }, "anim+=3.2");
+    }, "anim+=0.9");
 
-    // Image animation
-    tl.to(imgRef.current, {
-      autoAlpha: 1,
-      y: 0,
-      scale: 1,
-      duration: 1,
-      ease: "sine.out",
-    }, "anim+=4.2");
+    // Footer UI animation
+    if (footerUiRef.current) {
+      tl.to(footerUiRef.current, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power2.out",
+      }, "anim+=1.05");
+    }
 
-    // Stroke 2 animation (right side, slightly earlier)
-    tl.to(stroke2Ref.current, {
-      autoAlpha: 1,
-      width: stroke2Width,
-      duration: 1,
-      ease: "power2.out",
-    }, "anim+=4.3");
+    const DYNAMIC_COLORS = [
+      "#38bdf8",
+      "#818cf8",
+      "#c084fc",
+      "#f472b6",
+      "#3b82f6",
+      "#2dd4bf",
+    ];
 
-    // Stroke 1 animation (left side)
-    tl.to(stroke1Ref.current, {
-      autoAlpha: 1,
-      width: stroke1Width,
-      duration: 1,
-      ease: "power2.out",
-    }, "anim+=4.5");
+    // Dynamic cursor reaction on VAISHNAVI text: illuminates letters with
+    // dynamic fluid colors and subtle vertical lift as cursor sweeps past
+    const handleMouseMove = (e) => {
+      if (!headingRef.current) return;
+      const heading = headingRef.current;
+      const chars = heading.querySelectorAll(".hero-char");
+      if (!chars.length) return;
+
+      chars.forEach((char, index) => {
+        const charRect = char.getBoundingClientRect();
+        const charCenterX = charRect.left + charRect.width / 2;
+        const charCenterY = charRect.top + charRect.height / 2;
+        const dist = Math.hypot(e.clientX - charCenterX, e.clientY - charCenterY);
+
+        if (dist < 220) {
+          const intensity = Math.max(0, 1 - dist / 220);
+          const color = DYNAMIC_COLORS[index % DYNAMIC_COLORS.length];
+
+          char.style.color = color;
+          char.style.textShadow = `0 0 ${Math.round(24 * intensity)}px ${color}`;
+
+          gsap.to(char, {
+            y: -intensity * 16,
+            scale: 1 + intensity * 0.08,
+            duration: 0.2,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+        } else {
+          char.style.color = "";
+          char.style.textShadow = "";
+
+          gsap.to(char, {
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            ease: "elastic.out(1, 0.4)",
+            overwrite: "auto",
+          });
+        }
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
     return () => {
       tl.kill();
-      endLineTrigger.kill();
       if (parallaxInstanceRef.current) {
         try {
           parallaxInstanceRef.current.destroy();
         } catch (e) {}
         parallaxInstanceRef.current = null;
       }
+      window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("touchstart", handleFirstGesture);
       window.removeEventListener("click", handleFirstGesture);
       document.body.style.overflow = "";
@@ -206,60 +227,53 @@ const HeroSection = () => {
         <div id="loader-counter" ref={loaderCounterRef}>0</div>
       </div>
 
-      {/* Hero — direct children of #hero-section are parallax layers.
-          Each layer's `data-depth` controls how much it moves with the cursor. */}
+      {/* Hero Section */}
       <div id="hero-section" ref={sectionRef}>
-        {/* Animated fluid background. Not a `.hero-layer` so parallax-js skips it. */}
+        {/* Animated fluid background */}
         <div id="hero-bg-fluid">
           <LiquidEther
             colors={HERO_LIQUID_COLORS}
-            mouseForce={20}
-            cursorSize={100}
+            mouseForce={22}
+            cursorSize={110}
             isViscous={false}
-            viscous={30}
-            iterationsViscous={32}
-            iterationsPoisson={32}
-            resolution={0.5}
+            viscous={25}
+            iterationsViscous={8}
+            iterationsPoisson={12}
+            resolution={0.35}
+            BFECC={false}
             isBounce={false}
             autoDemo={true}
-            autoSpeed={0.5}
-            autoIntensity={2.2}
+            autoSpeed={0.4}
+            autoIntensity={1.8}
             takeoverDuration={0.25}
             autoResumeDelay={3000}
             autoRampDuration={0.6}
           />
         </div>
 
-        {/* Back stroke (behind heading) */}
-        <div className="hero-layer" data-depth="0.20" style={{ zIndex: 4 }}>
-          <div id="hero-stroke-2" ref={stroke2Ref}>
-            <img src="/Svg_Stroke.png" alt="" draggable="false" />
-          </div>
-        </div>
-
-        {/* Heading text (deepest, moves least) */}
+        {/* Heading text in parallax layer */}
         <div className="hero-layer" data-depth="0.10" style={{ zIndex: 5 }}>
           <div id="hero-heading" ref={headingRef}>
-            <SplitChars text="ELFEKKY" />
+            <SplitChars text="VAISHNAVI" />
           </div>
         </div>
 
-        {/* Portrait image (foreground, moves more) */}
-        <div className="hero-layer" data-depth="0.50" style={{ zIndex: 10 }}>
-          <div id="hero-img" ref={imgRef}>
-            <img src="/Portfolio_Img-4.png" alt="" draggable="false" />
+        {/* Hero floating badges & scroll cue */}
+        <div className="hero-footer-ui" ref={footerUiRef} style={{ zIndex: 15 }}>
+          <div className="hero-role-pill">
+            <span className="hero-pulse-dot" aria-hidden="true" />
+            <span>AI/ML ENGINEER &bull; B.TECH CSE</span>
+          </div>
+          <div className="hero-scroll-cue">
+            <span>EXPLORE</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
           </div>
         </div>
 
-        {/* Front stroke (top-most) */}
-        <div className="hero-layer" data-depth="0.30" style={{ zIndex: 11 }}>
-          <div id="hero-stroke-1" ref={stroke1Ref}>
-            <img src="/Svg_Stroke.png" alt="" draggable="false" />
-          </div>
-        </div>
-
-        {/* End-of-hero indicator line */}
-        <div className="hero-end-line" ref={endLineRef}></div>
+        {/* Soft bottom edge transition to next section */}
+        <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-bg via-bg/40 to-transparent pointer-events-none z-10" />
       </div>
     </>
   );

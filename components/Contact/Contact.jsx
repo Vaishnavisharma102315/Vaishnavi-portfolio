@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Real contact info — kept in sync with what's already in `SiteFooter`.
-// If any of these change, update them in both places.
-const EMAIL = "abdelruhamanelfekky@gmail.com";
-const WHATSAPP_URL = "https://wa.me/201080620024";
+// Contact info kept in sync with SiteFooter & Navbar
+const EMAIL = "vaishusharma44444@gmail.com";
+const LINKEDIN_URL = "https://www.linkedin.com/in/vaishnavisharma10/";
+const GITHUB_URL = "https://github.com/Vaishnavisharma102315";
 
 const ArrowUpRight = () => (
   <svg
@@ -26,12 +26,40 @@ const ArrowUpRight = () => (
   </svg>
 );
 
+const CopyIcon = () => (
+  <svg
+    width="13"
+    height="13"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+  </svg>
+);
+
 const Contact = () => {
+  const [copied, setCopied] = useState(false);
   const sectionRef = useRef(null);
   const eyebrowRef = useRef(null);
+  const statusRef = useRef(null);
   const headlineRef = useRef(null);
   const emailRef = useRef(null);
   const ctaRef = useRef(null);
+
+  const handleCopyEmail = (e) => {
+    e.preventDefault();
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(EMAIL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -41,8 +69,6 @@ const Contact = () => {
       const eyebrowChars = eyebrowRef.current?.querySelectorAll(".ct-char") ?? [];
       const headlineChars = headlineRef.current?.querySelectorAll(".ct-char") ?? [];
 
-      // Mirror the slogan/Subscribe character-reveal so the contact section
-      // feels like part of the same family of scroll moments.
       gsap.from(eyebrowChars, {
         opacity: 0,
         y: 40,
@@ -55,6 +81,21 @@ const Contact = () => {
           toggleActions: "play none none reverse",
         },
       });
+
+      if (statusRef.current) {
+        gsap.from(statusRef.current, {
+          opacity: 0,
+          scale: 0.95,
+          y: 20,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: statusRef.current,
+            start: "top 90%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
 
       gsap.from(headlineChars, {
         opacity: 0,
@@ -99,18 +140,49 @@ const Contact = () => {
         {splitChars("have a project in mind?")}
       </div>
 
+      <div
+        ref={statusRef}
+        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-theme-border bg-bg-alt text-xs font-semibold text-fg tracking-wide my-1 shadow-sm"
+      >
+        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+        <span>Open for AI/ML Roles &amp; Collaborations</span>
+      </div>
+
       <h2 id="ct-headline" ref={headlineRef}>
         {splitChars("let's talk.")}
       </h2>
 
-      <a
-        id="ct-email"
-        href={`mailto:${EMAIL}`}
+      <div
+        className="flex items-center gap-2.5 flex-wrap justify-center mt-2"
         ref={emailRef}
-        aria-label={`Email ${EMAIL}`}
       >
-        {EMAIL}
-      </a>
+        <a
+          id="ct-email"
+          href={`mailto:${EMAIL}`}
+          aria-label={`Email ${EMAIL}`}
+          style={{ marginTop: 0 }}
+        >
+          {EMAIL}
+        </a>
+        <button
+          type="button"
+          onClick={handleCopyEmail}
+          aria-label="Copy email address"
+          className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold tracking-wider rounded-full border border-theme-border bg-bg-alt text-fg hover:border-fg hover:text-accent transition-all cursor-pointer"
+        >
+          {copied ? (
+            <>
+              <span className="text-emerald-500 font-bold">✓</span>
+              <span>COPIED</span>
+            </>
+          ) : (
+            <>
+              <CopyIcon />
+              <span>COPY</span>
+            </>
+          )}
+        </button>
+      </div>
 
       <div id="ct-actions" ref={ctaRef}>
         <a id="ct-btn" href={`mailto:${EMAIL}`}>
@@ -119,11 +191,20 @@ const Contact = () => {
         </a>
         <a
           id="ct-btn-secondary"
-          href={WHATSAPP_URL}
+          href={LINKEDIN_URL}
           target="_blank"
           rel="noreferrer"
         >
-          <span>WHATSAPP</span>
+          <span>LINKEDIN</span>
+          <ArrowUpRight />
+        </a>
+        <a
+          id="ct-btn-secondary"
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span>GITHUB</span>
           <ArrowUpRight />
         </a>
       </div>

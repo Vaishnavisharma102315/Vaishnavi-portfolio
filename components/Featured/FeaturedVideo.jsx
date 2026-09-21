@@ -1,43 +1,43 @@
-import React, { useRef, useState } from "react";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+"use client";
+
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
-import featuredImage from "../../d7e3f658-ad2c-4625-a3eb-165e8d54403c.jpg";
 
-const FeaturedVideo = ({refForward, ...props }) => {
+const FeaturedVideo = ({ refForward, ...props }) => {
   const ref = useRef(null);
-
-  const variants = {
-    initial: { scale: 1, x: 0, y: 0 },
-    animate: { scale: 1.08, x: 0, y: 0 },
-  };
 
   const { scrollYProgress } = useScroll({
     target: refForward,
-    layoutEffect: false,
+    offset: ["start end", "end start"],
   });
 
-  const [progress, setProgress] = useState(0);
-  useMotionValueEvent(scrollYProgress, "change", (value) => {
-    setProgress(value);
-  });
+  const scale = useTransform(scrollYProgress, [0.1, 0.5, 0.9], [0.94, 1, 1.03]);
+  const y = useTransform(scrollYProgress, [0.1, 0.9], [40, -40]);
 
   return (
     <motion.div
       ref={ref}
-      variants={variants}
-      initial="initial"
-      animate={progress > 0.5 ? "animate" : "initial"}
-      className="relative md:absolute mx-auto md:mx-0 mt-4 md:mt-0 md:top-[55vh] md:left-20 md:translate-x-0 md:translate-y-0 z-30 w-[82vw] md:w-[40vw] max-w-[22rem] md:max-w-[856px] aspect-[3/4] md:aspect-[856/1024] overflow-hidden rounded-3xl"
+      style={{ scale, y }}
+      className="relative md:absolute mx-auto md:mx-0 mt-4 md:mt-0 md:top-[50vh] md:left-12 lg:left-20 md:translate-x-0 md:translate-y-0 z-30 w-[86vw] md:w-[38vw] max-w-[24rem] md:max-w-[480px] aspect-[3/4] overflow-hidden rounded-3xl border border-theme-border shadow-2xl"
       {...props}
     >
       <Image
-        src={featuredImage}
-        alt="Featured portrait"
+        src="/myself.png"
+        alt="Vaishnavi Sharma"
         fill
         priority
-        sizes="(max-width: 768px) 80vw, 40vw"
-        className="object-cover"
+        sizes="(max-width: 768px) 85vw, 40vw"
+        className="object-cover transition-transform duration-700 hover:scale-105"
       />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-bg-alt/90 backdrop-blur-md border border-theme-border text-xs font-semibold tracking-wider text-fg flex items-center justify-between pointer-events-none shadow-lg">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="tracking-wide">VAISHNAVI SHARMA</span>
+        </div>
+        <span className="text-[0.68rem] tracking-widest text-fg-muted font-medium uppercase">AI/ML ENGINEER</span>
+      </div>
     </motion.div>
   );
 };

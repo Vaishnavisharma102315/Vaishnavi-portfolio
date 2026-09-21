@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 
 // Real contact info — kept in sync with `Contact`, `SiteFooter`, and
 // `LetsTalk`. Update all four if these ever change.
-const EMAIL = "abdelruhamanelfekky@gmail.com";
-const WHATSAPP_URL = "https://wa.me/201080620024";
+const EMAIL = "vaishusharma44444@gmail.com";
+const LINKEDIN_URL = "https://www.linkedin.com/in/vaishnavisharma10/";
 
 // Smoothly scrolls to a section by id. Uses the active Lenis instance
 // (exposed by SmoothScroll on `window.__lenis`) when available, so the
@@ -30,13 +30,17 @@ const scrollToSection = (id) => {
 
 const Menu = ({ open, onOutsideClick, onClose }) => {
   const ref = useRef();
-  const handleChildClick = (event) => {
-    if (ref.current && !ref.current.contains(event.target)) {
-      onOutsideClick(event);
-    }
-  };
+  const onOutsideClickRef = useRef(onOutsideClick);
+  useEffect(() => {
+    onOutsideClickRef.current = onOutsideClick;
+  }, [onOutsideClick]);
 
   useEffect(() => {
+    const handleChildClick = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        onOutsideClickRef.current?.(event);
+      }
+    };
     document.addEventListener("click", handleChildClick);
     return () => {
       document.removeEventListener("click", handleChildClick);
@@ -51,14 +55,15 @@ const Menu = ({ open, onOutsideClick, onClose }) => {
     from: { y: 100, opacity: 0, transform: "rotate(-20deg)" },
   }));
   const [hidden, setHidden] = useState(true);
-  useEffect(() => {
 
-    if(open == false){
-      setTimeout(() => {
-        setHidden(false);}
-      , 500);
-    }else{
-      setHidden(true)
+  useEffect(() => {
+    let timer;
+    if (open === false) {
+      timer = setTimeout(() => {
+        setHidden(false);
+      }, 500);
+    } else {
+      setHidden(true);
     }
 
     contentsApi.start({
@@ -73,7 +78,10 @@ const Menu = ({ open, onOutsideClick, onClose }) => {
       transform: open ? `rotate(0deg)` : `rotate(-20deg)`,
     });
 
-  }, [open]);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [open, contentsApi, newsApi]);
 
   // Every entry maps to a real section that already exists on the home
   // page. The site is single-page, so these never navigate — they smooth
@@ -144,13 +152,13 @@ const Menu = ({ open, onOutsideClick, onClose }) => {
                 <span aria-hidden="true">↗</span>
               </a>
               <a
-                href={WHATSAPP_URL}
+                href={LINKEDIN_URL}
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => onClose && onClose()}
                 className="flex items-center justify-between border-2 border-fg text-fg rounded-xl px-4 py-3 text-sm tracking-widest font-semibold transition-colors duration-200 hover:bg-accent-soft"
               >
-                <span>WHATSAPP</span>
+                <span>LINKEDIN</span>
                 <span aria-hidden="true">↗</span>
               </a>
             </div>

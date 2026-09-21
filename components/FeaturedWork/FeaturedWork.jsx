@@ -37,8 +37,8 @@ const FeaturedWork = () => {
       </div>
       <div className="relative grid grid-rows-3 grid-cols-1 lg:grid-cols-2 gap-8 perspective-1000 w-full h-auto transform-style-3d">
         {Array.from({ length: 6 }, (_, index) => (
-          <motion.div ref={ref} className={"flex items-center shadow-lg text-center justify-center w-[30rem] rounded-3xl h-[27rem] text-black text-6xl"} style={{ rotateX: velocityFactor }}>
-            <Image src={`/textures/planet_${index + 1}.jpg`} width={300} height={270} className="w-full h-full object-cover rounded-3xl"/>
+          <motion.div key={index} ref={ref} className={"flex items-center shadow-lg text-center justify-center w-[30rem] rounded-3xl h-[27rem] text-black text-6xl"} style={{ rotateX: velocityFactor }}>
+            <Image src={`/textures/planet_${index + 1}.jpg`} alt={`Planet ${index + 1}`} width={300} height={270} className="w-full h-full object-cover rounded-3xl"/>
           </motion.div>
         ))}
       </div>
@@ -61,7 +61,7 @@ const Item = ({ rotation, index }) => {
   });
   return (
     <motion.div ref={ref} className={"bg-lime-300 flex items-center shadow-lg text-center justify-center w-[30rem] rounded-3xl h-[27rem] text-black text-6xl"} style={{ rotateX: rotation }}>
-      <Image src={`/textures/planet_${index + 1}.jpg`} width={30 * 16} height={27 * 16} />
+      <Image src={`/textures/planet_${index + 1}.jpg`} alt={`Planet ${index + 1}`} width={30 * 16} height={27 * 16} />
     </motion.div>
   );
 };

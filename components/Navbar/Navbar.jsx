@@ -10,8 +10,9 @@ import Link from "next/link";
 import MusicButton from "./MusicButton";
 
 // Shared contact targets — same as Menu/Contact/SiteFooter.
-const EMAIL = "abdelruhamanelfekky@gmail.com";
-const WHATSAPP_URL = "https://wa.me/201080620024";
+const EMAIL = "vaishusharma44444@gmail.com";
+const LINKEDIN_URL = "https://www.linkedin.com/in/vaishnavisharma10/";
+const GITHUB_URL = "https://github.com/Vaishnavisharma102315";
 
 // Smooth-scroll to an in-page section. Uses the global Lenis instance
 // exposed by SmoothScroll (window.__lenis) so mobile nav clicks feel
@@ -90,25 +91,28 @@ function Navbar() {
             className="tracking-wider font-semibold text-2xl cursor-pointer text-fg"
             style={{ letterSpacing: "-0.03em" }}
           >
-            ELFEKKY
+            VAISHNAVI
           </Link>
-          <button
-            type="button"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            className="nav_btn_sm flex items-center justify-center cursor-pointer"
-            onMouseEnter={() => !mobileOpen && setRotate({ transform: "rotate(90deg)" })}
-            onMouseLeave={() => !mobileOpen && setRotate({ transform: "rotate(0deg)" })}
-            onClick={() => {
-              const next = !mobileOpen;
-              setMobileOpen(next);
-              setRotate({ transform: next ? "rotate(45deg)" : "rotate(0deg)" });
-            }}
-          >
-            <animated.div className="text-[0.55rem] leading-none" style={rotate}>
-              {mobileOpen ? "✕" : "⬤ ⬤"}
-            </animated.div>
-          </button>
+          <div className="flex items-center gap-1">
+            <MusicButton compact />
+            <button
+              type="button"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              className="nav_btn_sm flex items-center justify-center cursor-pointer"
+              onMouseEnter={() => !mobileOpen && setRotate({ transform: "rotate(90deg)" })}
+              onMouseLeave={() => !mobileOpen && setRotate({ transform: "rotate(0deg)" })}
+              onClick={() => {
+                const next = !mobileOpen;
+                setMobileOpen(next);
+                setRotate({ transform: next ? "rotate(45deg)" : "rotate(0deg)" });
+              }}
+            >
+              <animated.div className="text-[0.55rem] leading-none" style={rotate}>
+                {mobileOpen ? "✕" : "⬤ ⬤"}
+              </animated.div>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -150,24 +154,38 @@ function Navbar() {
             ))}
           </nav>
 
-          <div className="mt-auto pt-8 flex flex-col gap-3">
+          <div className="mt-auto pt-6 flex flex-col gap-3">
+            <div className="flex items-center justify-between py-2 border-b border-theme-border">
+              <span className="text-fg-muted text-xs tracking-[0.2em] uppercase font-semibold">Theme</span>
+              <MusicButton compact />
+            </div>
             <p className="text-fg-muted text-xs tracking-[0.2em] uppercase">Get in touch</p>
             <a
               href={`mailto:${EMAIL}`}
               onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-between bg-fg text-bg rounded-full px-5 py-4 text-sm tracking-[0.2em] font-semibold"
+              className="flex items-center justify-between bg-fg text-bg rounded-full px-5 py-3.5 text-sm tracking-[0.2em] font-semibold"
             >
               <span>EMAIL</span>
               <span aria-hidden="true">↗</span>
             </a>
             <a
-              href={WHATSAPP_URL}
+              href={LINKEDIN_URL}
               target="_blank"
               rel="noreferrer"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-between border-2 border-fg text-fg rounded-full px-5 py-4 text-sm tracking-[0.2em] font-semibold"
+              className="flex items-center justify-between border-2 border-fg text-fg rounded-full px-5 py-3.5 text-sm tracking-[0.2em] font-semibold"
             >
-              <span>WHATSAPP</span>
+              <span>LINKEDIN</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-between border border-theme-border text-fg rounded-full px-5 py-3.5 text-sm tracking-[0.2em] font-semibold hover:border-fg"
+            >
+              <span>GITHUB</span>
               <span aria-hidden="true">↗</span>
             </a>
           </div>
@@ -177,8 +195,10 @@ function Navbar() {
       {/* Navbar large screen */}
       <div className="fixed top-0 left-0 w-full px-6 lg:px-20 z-[100001] ">
         <div className="items-start justify-between hidden lg:flex pt-14 pb-10">
-          <div className="tracking-wider font-AeonikMedium text-4xl">
-            <Link href="/" aria-label="Home"></Link>
+          <div className="tracking-wider font-semibold text-2xl text-fg" style={{ letterSpacing: "-0.03em" }}>
+            <Link href="/" aria-label="Home">
+              VAISHNAVI
+            </Link>
           </div>
           <div className="hidden lg:flex items-center justify-around font-AeonikMedium">
             <Trail open={open} className="flex">
